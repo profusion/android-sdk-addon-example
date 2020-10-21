@@ -1,0 +1,19 @@
+android_app {
+    name: "helloworldservice",
+    srcs: [
+        "src/com/profusion/helloworld/HelloWorldService.java",
+        "src/com/profusion/helloworld/IHelloWorldService.aidl"
+    ],
+    dex_preopt: {
+        enabled: false,
+    },
+    certificate: "platform",
+}
+
+javadoc {
+    name: "helloworld",
+    srcs: [
+        "src/com/profusion/helloworld/HelloWorldService.java",
+        "src/com/profusion/helloworld/IHelloWorldService.aidl"
+    ]
+}

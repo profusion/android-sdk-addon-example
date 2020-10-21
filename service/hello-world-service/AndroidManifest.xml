@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.profusion.helloworld"
+      android:versionCode="1"
+      android:versionName="1.0"
+      android:sharedUserId="android.uid.system">
+
+    <application android:label="Hello World Service"
+                 android:directBootAware="true">
+        <service android:name=".HelloWorldService"
+                 android:enabled="true"
+                 android:exported="true" >
+        </service>
+    </application>
+</manifest>
