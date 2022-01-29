@@ -4,14 +4,51 @@ Whether you are an OEM company or a developer customizing the Android Open Sourc
 
 The Android Software Development Kit (SDK) is a collection of libraries and tools that enables and makes it easier to develop Android applications. SDK Add-ons allow third-party actors to extend the Android SDK to add interfaces to their features without changing the Android SDK. According to the Android Compatibility Definition Document (CDD), OEMs are not allowed to change the Android public APIs - namely those in the protected namespaces: `java.*`, `javax.*`, `sun.*`, `android.*`, `com.android.*`. Therefore, by using add-ons, OEMs can add libraries in their namespaces, providing functionalities that can be exported without infringing the CDD. Having to build only the add-on is also a great advantage that might save a lot of development time.
 
-In this post, we will build an SDK Add-on containing an example service - for which we will cover all the necessary config files. We will also learn how to connect an application to our example service using the add-on. Here, we are assuming you already have access to the Android source code and that you can build and deploy these changes. The code and configuration files were made with Android 10 (API level 29) in mind but they can be easily modifiable to work with other versions.
+In this post, we will build an SDK Add-on containing an example service - for which we will cover all the necessary config files. We will also learn how to connect an application to our example service using the add-on. Here, we are assuming you already have access to the Android source code and that you can build and deploy these changes. The code and configuration files were made with Android 10 (API level 30) in mind but they can be easily modifiable to work with other versions.
+
+## Setting up the AOSP source tree
+
+The source code of AOSP and all necessary tools can be downloaded following the [instruction on this link](https://source.android.com/setup/build/downloading).
+
+This tutorial was written to be build with Android 11 (API 30). When pulling the code with `repo init`, specify the latest Android 11 code:
+
+```bash
+repo init -u https://android.googlesource.com/platform/manifest -b android-security-11.0.0_r51 -g all
+repo sync
+```
+
+---
+Tip: AOSP source code is **huge** and has hundreds of gigabytes. I recommend you to clone in an external HD if you don't have plenty of space.
+
+---
+
+
+### The content of this repository
+
+This repository contains the code to build an emulator image containing the **hello-world-service**, the SDK add-on containing the **hello-world-service** service libraries that apps that use the **hello-world-service** will use on theirs build process, and a sample app that will use the SDK add-on. The summary of the code follows:
+
+* `device/profusion/profusion_sdk_addon`: contains the configuration and manifest files for the SDK add-on. The `profusion_sdk_addon.mk` includes the **helloworld** product as part of this add-on;
+* `pacakges/services/profusion/hello-world-service`: contains the service itself, that will be run in the emulator and serve the applications. The service will be part of the framework;
+* `build/target/product`: instead of creating a new device, we just modified the `aos_x86_64.mk` to include the **hello-world-serivice** (part of Profusion packages).
+
+
+We supply a shell script `add_to_aosp.sh` to automatically copy all code to the correct place in the AOSP source tree. Pass to the script the path to where the AOSP repo is:
+
+```bash
+./add_to_aosp.sh /pathTo/aosp
+```
+
+If you use VSCode, you can use [Run on Save](https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave) to automatically update the files with this script on save.
+
+
 
 ## Hello World System Service
 
 To facilitate the understanding of how to build and extract your own SDK Add-on, we will create a simple "hello world" service so that later we can use an application to connect to it.
 
 ##### `HelloWorldService.java`
-```code
+
+```java
 package com.profusion.helloworld;
 
 import android.app.Service;
@@ -48,7 +85,8 @@ public class HelloWorldService extends Service {
 An [AIDL](https://source.android.com/devices/architecture/aidl/overview) interface is needed for a client app to connect to.
 
 ##### `IHelloWorldService.aidl`
-```code
+
+```java
 package com.profusion.helloworld;
 
 interface IHelloWorldService {
@@ -57,8 +95,10 @@ interface IHelloWorldService {
 ```
 
 The service also needs a set of permissions that will be installed on the `/system/etc` directory. When the client app is installed, it will look for this file to determine if the HelloWorld library exists. The service library is installed in the `/system/framework` directory.
+
 ##### `helloworld-permissions.xml`
-```code
+
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <permissions>
     <library name="helloworld" file="/system/framework/helloworld.jar"/>
@@ -72,7 +112,8 @@ Failure [INSTALL_FAILED_MISSING_SHARED_LIBRARY: Package couldn't be installed...
 
 Also, `AndroidManifest.xml` needs to define the service interface.
 ##### `AndroidManifest.xml`
-```code
+
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.profusion.helloworld"
@@ -91,58 +132,27 @@ Also, `AndroidManifest.xml` needs to define the service interface.
 
 ```
 
-Unfortunately, the SDK Add-on does not recognize the library if it's defined in an `Android.bp` file, so the `.jar` must be defined in an `Android.mk`. We will still have a `.bp`, but it only defines the service APK that will be built and will not be a part of the add-on.
+##### `hello-world-service/Android.bp`
 
-##### `Android.bp`
-```code
-android_app {
-    name: "helloworldservice",
-    srcs: [
-        "src/com/profusion/helloworld/HelloWorldService.java",
-        "src/com/profusion/helloworld/IHelloWorldService.aidl"
-    ],
-    dex_preopt: {
-        enabled: false,
-    },
-    certificate: "platform",
-}
-```
+The `android_app` entry is used to create the app. It tells Soong where the sources are, the [VINF](https://source.android.com/devices/architecture/vintf) manifest, and do other configurations to compile the service.
 
-##### `Android.mk`
-```code
-LOCAL_PATH:= $(call my-dir)
+The `prebuilt_etc` entry tells the Soong to copy the `helloworld-permissions.xml` to the `/etc` directory.
 
-# Copy helloworld-permissions.xml to /etc/permissions folder
-include $(CLEAR_VARS)
-LOCAL_MODULE := helloworld-permissions.xml
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_PATH := $(TARGET_OUT_ETC)/permissions
-LOCAL_SRC_FILES := helloworld-permissions.xml
-include $(BUILD_PREBUILT)
+The `java_sdk_library` entry specifies the sources to build an SDK library. This is used when creating the SDK. When you add the SDK to Android Studio, the application that you are developing will have access to this library.
 
-# Build helloworld library
-# The SDK Add-On does not find this module if it's only defined in the Android.bp.
-include $(CLEAR_VARS)
-LOCAL_MODULE := helloworld
-LOCAL_MODULE_TAGS := optional
-LOCAL_REQUIRED_MODULES := \
-	helloworld-permissions.xml
-LOCAL_CERTIFICATE := platform
-LOCAL_SRC_FILES := \
-	$(call all-java-files-under, src/com/profusion/helloworld) \
-	$(call all-Iaidl-files-under, src/com/profusion/helloworld)
-LOCAL_AIDL_INCLUDES := $(call all-Iaidl-files-under, src/com/profusion/helloworld)
-LOCAL_MODULE_CLASS := JAVA_LIBRARIES
-LOCAL_PROGUARD_ENABLED := disabled
-include $(BUILD_JAVA_LIBRARY)
-```
+The `javadoc` entry is used to create documentation for given sources. Text wrapped in `/* **/` is then included in the documentation. Check [javadoc](https://www.jetbrains.com/help/idea/viewing-reference-information.html) for more infos.
+
+##### `hello-world-service/Android.mk`
+
+Should contain commands that the blueprint cannot support. Since Android 11, the build system can create the `.jar` file with the Android blueprint. Checkout a previous commit in this repo to see how the Android make file was written to built the `.jar` file into Android 9.
 
 ## SDK Add-on configs
 If you already have a service, then this is the interesting part:
 You need a `.mk` file that defines the name and properties of your SDK Add-on, and several other files that define miscellaneous properties such as the API level being used, the revision version, and the libraries contained in the add-on. During the Android build, these files are bundled into a `.zip` containing the add-on to be distributed. In the next sections, I will go into further detail into each of the included files.
 
 ##### `profusion_sdk_addon.mk`
-```code
+
+```make
 # The name of this add-on (for the SDK)
 PRODUCT_SDK_ADDON_NAME := profusion_sdk_addon
 
@@ -165,6 +175,7 @@ PRODUCT_SDK_ADDON_COPY_MODULES := \
 # Rules for public APIs
 PRODUCT_SDK_ADDON_STUB_DEFS := $(LOCAL_PATH)/sdk_addon_stub_defs.txt
 ```
+
 The `profusion_sdk_addon.mk` provides all the information needed to build the add-on, like the modules that will be included. In this case, we want to include our helloworld.jar, so we need to specify the module to be built in the `PRODUCT_PACKAGES` variable and copy it to the add-on using the `PRODUCT_SDK_ADDON_COPY_MODULES` variable. The `PRODUCT_SDK_ADDON_COPY_FILES` is used to copy the config files that will be used in Android Studio to build the application.
 
 ##### `manifest.ini`
@@ -177,7 +188,7 @@ vendor=Profusion
 vendor-id=profusion
 description=Profusion SDK Add-On
 
-api=29
+api=30
 revision=1
 libraries=helloworld
 helloworld=helloworld.jar
@@ -196,7 +207,7 @@ Pkg.UserSrc=false
 Archive.Arch=ANY
 Archive.Os=ANY
 
-AndroidVersion.ApiLevel=29
+AndroidVersion.ApiLevel=30
 SystemImage.TagDisplay=Profusion SDK Add-On
 SystemImage.TagId=profusionaddon
 SystemImage.Abi=${TARGET_CPU_ABI}
@@ -204,12 +215,13 @@ SystemImage.Abi=${TARGET_CPU_ABI}
 The `source.properties` defines add-on properties used for the built image, which can be distributed along with the SDK Add-on.
 
 ##### `package.xml`
-```code
+
+```xml
 <ns2:repository xmlns:ns2="http://schemas.android.com/repository/android/common/01" xmlns:ns3="http://schemas.android.com/repository/android/generic/01" xmlns:ns4="http://schemas.android.com/sdk/android/repo/addon2/01" xmlns:ns5="http://schemas.android.com/sdk/android/repo/repository2/01" xmlns:ns6="http://schemas.android.com/sdk/android/repo/sys-img2/01">
   <license id="license-CC939D3F" type="text"/>
-  <localPackage path="add-ons;addon-profusionaddon-profusion-29" obsolete="false">
+  <localPackage path="add-ons;addon-profusionaddon-profusion-30" obsolete="false">
     <type-details xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns4:addonDetailsType">
-      <api-level>29</api-level>
+      <api-level>30</api-level>
       <vendor>
         <id>profusion</id>
         <display>Profusion</display>
@@ -229,7 +241,7 @@ The `source.properties` defines add-on properties used for the built image, whic
       <minor>0</minor>
       <micro>0</micro>
     </revision>
-    <display-name>ProfusionAddOn, Android 29, rev 1</display-name>
+    <display-name>ProfusionAddOn, Android 30, rev 51</display-name>
     <uses-license ref="license-CC939D3F"/>
   </localPackage>
 </ns2:repository>
@@ -237,31 +249,61 @@ The `source.properties` defines add-on properties used for the built image, whic
 The `package.xml` file makes it easier for Android Studio to import the add-on.
 
 ##### `sdk_addon_stub_defs.txt`
+
 ```code
 +com.profusion.helloworld.*
 ```
 The `sdk_addon_stub_defs.txt` file contains the rules for public APIs.
 
 For these tests, I was using `lunch aosp_x86_64-eng`, so I decided to add the reference to `profusion_sdk_addon.mk` in the `build/make/target/product/aosp_x86_64.mk`, but you may add it to whichever device you are using. Simply add:
-```code
+
+```make
 $(call inherit-product, $(SRC_TARGET_DIR)/product/profusion_sdk_addon/profusion_sdk_addon.mk)
 ```
 
-### Building
+### Building the SDK addon
 The SDK Add-on is all set. Now we only have to build it. Notice, again, that I'm using `aosp_x86_64`:
-```code
-$ make PRODUCT-aosp_x86_64-sdk_addon
+
+```bash
+. build/envsetup.sh
+export TARGET=profusion_sdk_addon
+lunch aosp_x86_64-eng
+make -j 4 sdk_addon
 ```
 
 When the compilation succeeds, the SDK Add-on `.zip` will be in `out/host/linux-x86/sdk_addon/profusion_sdk_addon-eng.user-linux-x86.zip`
 
+### Building Android
+
+To build Android containing the library that we want to supply, do
+
+```bash
+# . build/envsetup.sh if you are doing it on a new shell
+lunch aosp_x86_64-eng
+m
+```
+
 ## Adding the SDK Add-on to Android Studio
 
-Create a path on your Android SDK for the add-ons, then extract the contents of the add-on `.zip` file. You will need to rename the directory using the names defined in the "localPackage path" in the `package.xml`
-```code
-$ mkdir -p /path/to/Sdk/add-ons
-$ unzip out/host/linux-x86/sdk_addon/profusion_sdk_addon-eng.user-linux-x86.zip -d /path/to/Sdk/add-ons/
-$ mv /path/to/Sdk/add-ons/profusion_sdk_addon-eng.user-linux-x86/ /path/to/Sdk/add-ons/addon-profusionaddon-profusion-29/
+Create a path on your Android SDK for the add-ons, then extract the contents of the add-on `.zip` file. You will need to rename the directory using the names defined in the "localPackage path" in the `package.xml`.
+
+Check the environment variable that points to Android's Sdk root.
+
+```bash
+echo $ANDROID_SDK_ROOT
+```
+
+If the variable is empty, you must define the path to your `Android/Sdk` directory. It is usually under your $HOME:
+
+```
+export ANDROID_SDK_ROOT=~/Android/Sdk # default location
+```
+
+
+```bash
+mkdir -p "$ANDROID_SDK_ROOT"/add-ons # or ~/Android/Sdk
+unzip out/host/linux-x86/sdk_addon/profusion_sdk_addon-eng.$USER-linux-x86.zip -d /path/to/Sdk/add-ons/
+mv /path/to/Sdk/add-ons/profusion_sdk_addon-eng.user-linux-x86/ "$ANDROID_SDK_ROOT"/add-ons/addon-profusionaddon-profusion-30/
 ```
 
 Open Android Studio and go to Tools -> SDK Manager. Check the "Show Package Details" checkbox then you will be able to see the SDK Add-on for the API level configured.
@@ -272,7 +314,7 @@ Open Android Studio and go to Tools -> SDK Manager. Check the "Show Package Deta
 To use the SDK Add-on, you must first change the `compileSdkVersion` on the `build.gradle` to the vendor name, along with the add-on name and the API level - as defined in the `manifest.ini` - all separated by colons. In your case, it will look like this:
 ```code
 ...
-  compileSdkVersion 'Profusion:ProfusionAddOn:29'
+  compileSdkVersion 'Profusion:ProfusionAddOn:30'
 ...
 ```
 
@@ -281,7 +323,8 @@ Sometimes Android Studio will not recognize the package, so I recommend you go t
 
 Below is an example of an application using the HelloWorldService:
 ##### `MainActivity.kt`
-```code
+
+```kotlin
 package com.profusion.helloworldapplication
 
 import android.app.Activity
@@ -337,7 +380,8 @@ class MainActivity : Activity() {
 ```
 
 Make sure to include the following in your `AndroidManifest.xml` under the application tag:
-```code
+
+```xml
     <application
         ...
         <uses-library android:name="helloworld"
@@ -348,10 +392,39 @@ Make sure to include the following in your `AndroidManifest.xml` under the appli
 
 And that's it!
 
+## Running on the emulator
+
+After build, you can run the emulator in the terminal where you set up the environment variables with
+
+```
+emulator
+```
+
+### Build and install the App
+
+After including the SDK Addon that we created in the correct directory under your `$ANDROID_SDK_HOME`, you can build the app with Android Studio _Build > Make Project_, or with command line:
+
+```bash
+cd app/HelloWorldApplication
+./gradlew installDebug
+```
+
+or
+
+```bash
+cd app/HelloWorldApplication
+./gradlew build
+adb install app/build/outputs/apk/release/app-release-unsigned.apk
+```
+
+### Running the app
+
 If you run the application and then check the `logcat` searching for "HelloWorldService," then you will be able to see the service printing "Hello World."
 
-```code
-$ adb shell
+```bash
+adb shell
 # logcat | grep -i HelloWorldService
 3261  3279 D HelloWorldService: Hello World.
 ```
+
+![Android emulator running the helloworld app and helloword service](running_app.png "Helloworld App")

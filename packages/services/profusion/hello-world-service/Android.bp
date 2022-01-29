@@ -1,0 +1,52 @@
+android_app {
+    name: "helloworldservice",
+    platform_apis: true,
+    srcs: [
+        "src/com/profusion/helloworld/HelloWorldService.java",
+        "src/com/profusion/helloworld/IHelloWorldService.aidl"
+    ],
+    dex_preopt: {
+        enabled: false,
+    },
+    certificate: "platform",
+    vintf_fragments: [
+        "helloworldservice.xml",
+    ],
+}
+
+// Copy helloworld-permissions.xml to /etc/permissions folder
+prebuilt_etc {
+    name: "helloworld-permissions.xml",
+
+    src: "helloworld-permissions.xml",
+    sub_dir: "permissions",
+}
+
+
+java_sdk_library {
+    name: "helloworld",
+    installable: true,
+
+    required: ["helloworld-permissions.xml"],
+    // certificate: "platform",
+    srcs: [
+        "src/com/profusion/helloworld/HelloWorldService.java",
+        "src/com/profusion/helloworld/*.java",
+        "src/com/profusion/helloworld/I*.aidl",
+    ],
+    aidl: {
+        local_include_dirs: ["src/com/profusion/helloworld"],
+    },
+
+    optimize: {
+        enabled: false,
+    },
+}
+
+javadoc {
+    name: "helloworld-doc",
+    srcs: [
+        "src/com/profusion/helloworld/HelloWorldService.java",
+        "src/com/profusion/helloworld/IHelloWorldService.aidl"
+    ]
+}
