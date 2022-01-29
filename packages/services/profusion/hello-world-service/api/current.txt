@@ -1,0 +1,29 @@
+// Signature format: 2.0
+package com.profusion.helloworld {
+
+  public class HelloWorldService extends android.app.Service {
+    ctor public HelloWorldService();
+    method public android.os.IBinder onBind(android.content.Intent);
+  }
+
+  public interface IHelloWorldService extends android.os.IInterface {
+    method public void printHelloWorld() throws android.os.RemoteException;
+  }
+
+  public static class IHelloWorldService.Default implements com.profusion.helloworld.IHelloWorldService {
+    ctor public IHelloWorldService.Default();
+    method public android.os.IBinder asBinder();
+    method public void printHelloWorld() throws android.os.RemoteException;
+  }
+
+  public abstract static class IHelloWorldService.Stub extends android.os.Binder implements com.profusion.helloworld.IHelloWorldService {
+    ctor public IHelloWorldService.Stub();
+    method public android.os.IBinder asBinder();
+    method public static com.profusion.helloworld.IHelloWorldService asInterface(android.os.IBinder);
+    method public static com.profusion.helloworld.IHelloWorldService getDefaultImpl();
+    method public boolean onTransact(int, android.os.Parcel, android.os.Parcel, int) throws android.os.RemoteException;
+    method public static boolean setDefaultImpl(com.profusion.helloworld.IHelloWorldService);
+  }
+
+}
+

@@ -2,9 +2,11 @@
 # SDK Add-On (build/make/core/tasks/sdk-addon.mk)
 # ============================================================
 # Real name of the add-on. This is the name used to build the add-on.
-# Use 'make PRODUCT-<PRODUCT_NAME>-sdk_addon' to build the add-on.
-# If they didn't define PRODUCT_SDK_ADDON_NAME, then we won't define
+# Use `TARGET_PRODUCT=PRODUCT-<PRODUCT_NAME> m droid` to build the add-on.
+# If they didn't define PRODUCT_SDK_ADDON_NAME, then we won't define < TODO remove?
 # any of sdk_addon rules.
+
+#$(call inherit-product, build/make/target/product/aosp_x86_64.mk)
 
 # The name of this add-on (for the SDK)
 PRODUCT_SDK_ADDON_NAME := profusion_sdk_addon
@@ -40,8 +42,8 @@ PRODUCT_SDK_ADDON_STUB_DEFS := $(LOCAL_PATH)/sdk_addon_stub_defs.txt
 # The name of this add-on (for the build system)
 # Use 'make PRODUCT-<PRODUCT_NAME>-sdk_addon' to build the add-on,
 # so in this case, we would run 'make PRODUCT-profusion_sdk_addon-sdk_addon'
-#PRODUCT_NAME := profusion_sdk_addon
-#PRODUCT_MODEL := Profusion SDK Addon
-#PRODUCT_DEVICE := generic_x86_64
-#PRODUCT_BRAND := Android
+PRODUCT_NAME := profusion_sdk_addon
+PRODUCT_MODEL := Profusion SDK Addon
+PRODUCT_DEVICE := generic_x86_64
+PRODUCT_BRAND := Android
 ############################################################################
