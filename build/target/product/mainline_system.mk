@@ -34,15 +34,14 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     LiveWallpapersPicker \
     PartnerBookmarksProvider \
-    PresencePolling \
-    RcsService \
-    SafetyRegulatoryInfo \
+    preinstalled-packages-platform-generic-system.xml \
     Stk \
     Tag \
-    TimeZoneUpdater \
 
-# Binaries
-PRODUCT_PACKAGES += llkd
+ifeq ($(RELEASE_AVATAR_PICKER_APP),true)
+  PRODUCT_PACKAGES += \
+    AvatarPicker
+endif
 
 # OTA support
 PRODUCT_PACKAGES += \
@@ -61,11 +60,6 @@ PRODUCT_PACKAGES += \
     cppreopts.sh \
     otapreopt_script \
 
-# Bluetooth libraries
-PRODUCT_PACKAGES += \
-    audio.a2dp.default \
-    audio.hearing_aid.default \
-
 # For ringtones that rely on forward lock encryption
 PRODUCT_PACKAGES += libfwdlockengine
 
@@ -81,7 +75,7 @@ PRODUCT_PACKAGES += \
     android.hardware.radio.config@1.0 \
     android.hardware.radio.deprecated@1.0 \
     android.hardware.secure_element@1.0 \
-    android.hardware.wifi@1.0 \
+    android.hardware.wifi \
     libaudio-resampler \
     libaudiohal \
     libdrm \
@@ -101,20 +95,32 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES_DEBUG += \
     avbctl \
     bootctl \
-    tinyplay \
     tinycap \
+    tinyhostless \
     tinymix \
     tinypcminfo \
+    tinyplay \
     update_engine_client \
 
 PRODUCT_HOST_PACKAGES += \
     tinyplay
 
+# Enable configurable audio policy
+PRODUCT_PACKAGES += \
+    libaudiopolicyengineconfigurable \
+    libpolicy-subsystem
+
+# Add all of the packages used to support older/upgrading devices
+# These can be removed as we drop support for the older API levels
+PRODUCT_PACKAGES += \
+    $(PRODUCT_PACKAGES_SHIPPING_API_LEVEL_29) \
+    $(PRODUCT_PACKAGES_SHIPPING_API_LEVEL_33) \
+    $(PRODUCT_PACKAGES_SHIPPING_API_LEVEL_34)
+
 # Include all zygote init scripts. "ro.zygote" will select one of them.
 PRODUCT_COPY_FILES += \
     system/core/rootdir/init.zygote32.rc:system/etc/init/hw/init.zygote32.rc \
     system/core/rootdir/init.zygote64.rc:system/etc/init/hw/init.zygote64.rc \
-    system/core/rootdir/init.zygote32_64.rc:system/etc/init/hw/init.zygote32_64.rc \
     system/core/rootdir/init.zygote64_32.rc:system/etc/init/hw/init.zygote64_32.rc \
 
 # Enable dynamic partition size
@@ -122,11 +128,11 @@ PRODUCT_USE_DYNAMIC_PARTITION_SIZE := true
 
 PRODUCT_ENFORCE_RRO_TARGETS := *
 
-PRODUCT_NAME := mainline_system
+PRODUCT_NAME := generic_system
 PRODUCT_BRAND := generic
 
 # Define /system partition-specific product properties to identify that /system
-# partition is mainline_system.
+# partition is generic_system.
 PRODUCT_SYSTEM_NAME := mainline
 PRODUCT_SYSTEM_BRAND := Android
 PRODUCT_SYSTEM_MANUFACTURER := Android

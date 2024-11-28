@@ -11,6 +11,9 @@
 # The name of this add-on (for the SDK)
 PRODUCT_SDK_ADDON_NAME := profusion_sdk_addon
 
+PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST+= \
+    system/%
+
 PRODUCT_PACKAGES := \
     helloworld
 

@@ -1,8 +1,8 @@
 <ns2:repository xmlns:ns2="http://schemas.android.com/repository/android/common/01" xmlns:ns3="http://schemas.android.com/repository/android/generic/01" xmlns:ns4="http://schemas.android.com/sdk/android/repo/addon2/01" xmlns:ns5="http://schemas.android.com/sdk/android/repo/repository2/01" xmlns:ns6="http://schemas.android.com/sdk/android/repo/sys-img2/01">
   <license id="license-CC939D3F" type="text"/>
-  <localPackage path="add-ons;addon-profusionaddon-profusion-30" obsolete="false">
+  <localPackage path="add-ons;addon-profusionaddon-profusion-34" obsolete="false">
     <type-details xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns4:addonDetailsType">
-      <api-level>30</api-level>
+      <api-level>34</api-level>
       <vendor>
 	<id>profusion</id>
 	<display>Profusion</display>
@@ -22,7 +22,7 @@
       <minor>0</minor>
       <micro>0</micro>
     </revision>
-    <display-name>ProfusionAddOn, Android 30, rev 51</display-name>
+    <display-name>ProfusionAddOn, Android 34, rev 75</display-name>
     <uses-license ref="license-CC939D3F"/>
   </localPackage>
 </ns2:repository>
