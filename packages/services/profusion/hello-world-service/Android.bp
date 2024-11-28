@@ -37,6 +37,7 @@ java_sdk_library {
     aidl: {
         local_include_dirs: ["src/com/profusion/helloworld"],
     },
+    unsafe_ignore_missing_latest_api: true,
 
     optimize: {
         enabled: false,

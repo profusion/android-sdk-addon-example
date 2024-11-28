@@ -32,7 +32,7 @@ PRODUCT_USE_DYNAMIC_PARTITIONS := true
 # All components inherited here go to system image
 #
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
-$(call inherit-product, $(SRC_TARGET_DIR)/product/mainline_system.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/generic_system.mk)
 
 # Enable mainline checking for excat this product name
 ifeq (aosp_x86_64,$(TARGET_PRODUCT))
@@ -45,6 +45,10 @@ endif
 $(call inherit-product, $(SRC_TARGET_DIR)/product/handheld_system_ext.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/telephony_system_ext.mk)
 
+# pKVM
+$(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
+
+
 #
 # All components inherited here go to product image
 #
@@ -53,15 +57,15 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_product.mk)
 #
 # All components inherited here go to vendor image
 #
-$(call inherit-product-if-exists, device/generic/goldfish/x86_64-vendor.mk)
-$(call inherit-product, $(SRC_TARGET_DIR)/product/emulator_vendor.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/board/generic_x86_64/device.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/non_ab_device.mk)
 $(call inherit-product, device/profusion/profusion_sdk_addon/profusion_sdk_addon.mk)
 
 #
 # Special settings for GSI releasing
 #
 ifeq (aosp_x86_64,$(TARGET_PRODUCT))
+MODULE_BUILD_FROM_SOURCE ?= true
 $(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_release.mk)
 endif
 
