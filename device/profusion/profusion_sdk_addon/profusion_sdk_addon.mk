@@ -1,18 +1,14 @@
 # ============================================================
 # SDK Add-On (build/make/core/tasks/sdk-addon.mk)
 # ============================================================
-# Real name of the add-on. This is the name used to build the add-on.
-# Use `TARGET_PRODUCT=PRODUCT-<PRODUCT_NAME> m droid` to build the add-on.
-# If they didn't define PRODUCT_SDK_ADDON_NAME, then we won't define < TODO remove?
-# any of sdk_addon rules.
 
-#$(call inherit-product, build/make/target/product/aosp_x86_64.mk)
+# Uncomment this to run with 'TARGET_PRODUCT=profusion_sdk_addon TARGET_RELEASE=trunk_staging m droid'
+# $(call inherit-product, device/generic/car/sdk_car_x86_64.mk)
 
 # The name of this add-on (for the SDK)
 PRODUCT_SDK_ADDON_NAME := profusion_sdk_addon
 
-PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST+= \
-    system/%
+INTERNAL_SDK_HOST_OS_NAME := $(HOST_OS)
 
 PRODUCT_PACKAGES := \
     helloworld
@@ -40,13 +36,13 @@ PRODUCT_SDK_ADDON_STUB_DEFS := $(LOCAL_PATH)/sdk_addon_stub_defs.txt
 #    helloworld
 
 # This add-on extends the default sdk product.
-#$(call inherit-product, $(SRC_TARGET_DIR)/product/sdk.mk)
+# $(call inherit-product, $(SRC_TARGET_DIR)/product/sdk.mk)
 
 # The name of this add-on (for the build system)
-# Use 'make PRODUCT-<PRODUCT_NAME>-sdk_addon' to build the add-on,
-# so in this case, we would run 'make PRODUCT-profusion_sdk_addon-sdk_addon'
+# Use 'TARGET_PRODUCT=<PRODUCT_NAME> m droid' to build the add-on,
+# so in this case, we would run 'TARGET_PRODUCT=profusion_sdk_addon TARGET_RELEASE=trunk_staging m droid'
 PRODUCT_NAME := profusion_sdk_addon
 PRODUCT_MODEL := Profusion SDK Addon
-PRODUCT_DEVICE := generic_x86_64
+PRODUCT_DEVICE := emulator_car64_x86_64
 PRODUCT_BRAND := Android
 ############################################################################

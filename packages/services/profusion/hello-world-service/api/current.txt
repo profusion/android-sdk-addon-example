@@ -20,9 +20,7 @@ package com.profusion.helloworld {
     ctor public IHelloWorldService.Stub();
     method public android.os.IBinder asBinder();
     method public static com.profusion.helloworld.IHelloWorldService asInterface(android.os.IBinder);
-    method public static com.profusion.helloworld.IHelloWorldService getDefaultImpl();
     method public boolean onTransact(int, android.os.Parcel, android.os.Parcel, int) throws android.os.RemoteException;
-    method public static boolean setDefaultImpl(com.profusion.helloworld.IHelloWorldService);
   }
 
 }
