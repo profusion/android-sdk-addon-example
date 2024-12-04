@@ -10,8 +10,8 @@ if [ ! -d "$AOSP" ]; then
     printf "Directory %s does not exists" "$AOSP"
 fi
 
-echo "Overriting build/target"
-rsync -a --inplace "$GIT_ROOT"/build/target "$AOSP"/build/make
+echo "Overriting build/make"
+rsync -a --inplace "$GIT_ROOT"/build/ "$AOSP"/build/make
 
 echo "Copying profusion sdk addon to device"
 rsync -a --inplace "$GIT_ROOT"/device "$AOSP"
