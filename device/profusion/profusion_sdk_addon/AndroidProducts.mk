@@ -15,8 +15,8 @@
 #
 
 # Add the custom SDK add-on
-PRODUCT_MAKEFILES += \
+PRODUCT_MAKEFILES := \
  $(LOCAL_DIR)/profusion_sdk_addon.mk
 
 # Uncomment this if you want to run using `TARGET_PRODUCT=profusion_sdk_addon  m droid`
-# TARGET_SUPPORTS_64_BIT_APPS := true 
+TARGET_SUPPORTS_64_BIT_APPS := true 

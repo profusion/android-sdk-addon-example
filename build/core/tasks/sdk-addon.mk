@@ -64,27 +64,28 @@ $(foreach cf,$(PRODUCT_SDK_ADDON_COPY_FILES), \
 endif
 
 # Files copied in the system-image directory
-files_to_copy += \
-	$(addon_dir_img):$(INSTALLED_QEMU_SYSTEMIMAGE):images/$(TARGET_CPU_ABI)/system.img \
-	$(addon_dir_img):$(INSTALLED_QEMU_VENDORIMAGE):images/$(TARGET_CPU_ABI)/vendor.img \
-	$(addon_dir_img):$(INSTALLED_QEMU_RAMDISKIMAGE):images/$(TARGET_CPU_ABI)/ramdisk.img \
-	$(addon_dir_img):$(PRODUCT_OUT)/system/build.prop:images/$(TARGET_CPU_ABI)/build.prop \
-	$(addon_dir_img):device/generic/goldfish/data/etc/userdata.img:images/$(TARGET_CPU_ABI)/userdata.img \
-	$(addon_dir_img):$(target_notice_file_txt):images/$(TARGET_CPU_ABI)/NOTICE.txt \
-	$(addon_dir_img):$(PRODUCT_SDK_ADDON_SYS_IMG_SOURCE_PROP):images/source.properties
+# files_to_copy += \
+# 	$(addon_dir_img):$(INSTALLED_QEMU_SYSTEMIMAGE):images/$(TARGET_CPU_ABI)/system.img \
+# 	$(addon_dir_img):$(INSTALLED_QEMU_VENDORIMAGE):images/$(TARGET_CPU_ABI)/vendor.img \
+# 	$(addon_dir_img):$(INSTALLED_QEMU_RAMDISKIMAGE):images/$(TARGET_CPU_ABI)/ramdisk.img \
+# 	$(addon_dir_img):$(PRODUCT_OUT)/system/build.prop:images/$(TARGET_CPU_ABI)/build.prop \
+# 	$(addon_dir_img):device/generic/goldfish/data/etc/userdata.img:images/$(TARGET_CPU_ABI)/userdata.img \
+# 	$(addon_dir_img):$(target_notice_file_txt):images/$(TARGET_CPU_ABI)/NOTICE.txt \
+# 	$(addon_dir_img):$(PRODUCT_SDK_ADDON_SYS_IMG_SOURCE_PROP):images/source.properties
 
 
-ifeq ($(BOARD_AVB_ENABLE),true)
-files_to_copy += \
-	$(addon_dir_img):$(QEMU_VERIFIED_BOOT_PARAMS):images/$(TARGET_CPU_ABI)/VerifiedBootParams.textproto
-endif
+# ifeq ($(BOARD_AVB_ENABLE),true)
+# files_to_copy += \
+# 	$(addon_dir_img):$(QEMU_VERIFIED_BOOT_PARAMS):images/$(TARGET_CPU_ABI)/VerifiedBootParams.textproto
+# endif
 
 # Generate rules to copy the requested files
 $(foreach cf,$(files_to_copy), \
-  $(info copy_file = $(cf)) \
+  $(info cf: $(cf)) \
   $(eval _root := $(call word-colon,1,$(cf))) \
   $(eval _src  := $(call word-colon,2,$(cf))) \
   $(eval _dest := $(call append-path,$(call append-path,$(staging),$(_root)),$(call word-colon,3,$(cf)))) \
+  $(info copy $(_src) to $(_dest)) \
   $(eval $(call copy-one-file,$(_src),$(_dest))) \
   $(eval sdk_addon_deps += $(_dest)) \
  )
