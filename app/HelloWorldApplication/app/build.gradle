@@ -4,12 +4,13 @@ plugins {
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 'Profusion:ProfusionAddOn:30'
+    compileSdkVersion 'Profusion:ProfusionAddOn:34'
+    namespace 'com.profusion.helloworldapplication'
 
     defaultConfig {
         applicationId "com.profusion.helloworldapplication"
         minSdkVersion 29
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode 1
         versionName "1.1"
 
@@ -23,8 +24,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
