@@ -10,18 +10,12 @@ In this post, we will build an SDK Add-on containing an example service - for wh
 
 The source code of AOSP and all necessary tools can be downloaded following the [instruction on this link](https://source.android.com/setup/build/downloading).
 
-This tutorial was written to be build with Android 11 (API 30). When pulling the code with `repo init`, specify the latest Android 11 code:
+This tutorial was written to be build with Android 14 (API 34). When pulling the code with `repo init`, specify the latest Android 14 code:
 
 ```bash
-repo init -u https://android.googlesource.com/platform/manifest -b android-security-11.0.0_r51 -g all
+repo init -b android-14.0.0_r75 -u https://android.googlesource.com/platform/manifest
 repo sync
 ```
-
----
-Tip: AOSP source code is **huge** and has hundreds of gigabytes. I recommend you to clone in an external HD if you don't have plenty of space.
-
----
-
 
 ### The content of this repository
 
@@ -29,7 +23,7 @@ This repository contains the code to build an emulator image containing the **he
 
 * `device/profusion/profusion_sdk_addon`: contains the configuration and manifest files for the SDK add-on. The `profusion_sdk_addon.mk` includes the **helloworld** product as part of this add-on;
 * `pacakges/services/profusion/hello-world-service`: contains the service itself, that will be run in the emulator and serve the applications. The service will be part of the framework;
-* `build/target/product`: instead of creating a new device, we just modified the `aos_x86_64.mk` to include the **hello-world-serivice** (part of Profusion packages).
+* `target`: contains files related to the emulator that will be created. Instead of creating a new device, we just modified the `sdk_car_x86_64.mk` and `car_generic_system.mk` to include our add-on.
 
 
 We supply a shell script `add_to_aosp.sh` to automatically copy all code to the correct place in the AOSP source tree. Pass to the script the path to where the AOSP repo is:
@@ -156,6 +150,8 @@ You need a `.mk` file that defines the name and properties of your SDK Add-on, a
 # The name of this add-on (for the SDK)
 PRODUCT_SDK_ADDON_NAME := profusion_sdk_addon
 
+INTERNAL_SDK_HOST_OS_NAME := $(HOST_OS)
+
 PRODUCT_PACKAGES := \
     helloworld
 
@@ -188,7 +184,7 @@ vendor=Profusion
 vendor-id=profusion
 description=Profusion SDK Add-On
 
-api=30
+api=34
 revision=1
 libraries=helloworld
 helloworld=helloworld.jar
@@ -207,7 +203,7 @@ Pkg.UserSrc=false
 Archive.Arch=ANY
 Archive.Os=ANY
 
-AndroidVersion.ApiLevel=30
+AndroidVersion.ApiLevel=34
 SystemImage.TagDisplay=Profusion SDK Add-On
 SystemImage.TagId=profusionaddon
 SystemImage.Abi=${TARGET_CPU_ABI}
@@ -221,7 +217,7 @@ The `source.properties` defines add-on properties used for the built image, whic
   <license id="license-CC939D3F" type="text"/>
   <localPackage path="add-ons;addon-profusionaddon-profusion-30" obsolete="false">
     <type-details xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns4:addonDetailsType">
-      <api-level>30</api-level>
+      <api-level>34</api-level>
       <vendor>
         <id>profusion</id>
         <display>Profusion</display>
@@ -241,7 +237,7 @@ The `source.properties` defines add-on properties used for the built image, whic
       <minor>0</minor>
       <micro>0</micro>
     </revision>
-    <display-name>ProfusionAddOn, Android 30, rev 51</display-name>
+    <display-name>ProfusionAddOn, Android 34, rev 75</display-name>
     <uses-license ref="license-CC939D3F"/>
   </localPackage>
 </ns2:repository>
@@ -255,23 +251,23 @@ The `package.xml` file makes it easier for Android Studio to import the add-on.
 ```
 The `sdk_addon_stub_defs.txt` file contains the rules for public APIs.
 
-For these tests, I was using `lunch aosp_x86_64-eng`, so I decided to add the reference to `profusion_sdk_addon.mk` in the `build/make/target/product/aosp_x86_64.mk`, but you may add it to whichever device you are using. Simply add:
+For these tests, I was using `lunch sdk_car_x86_64-trunk_staging-eng`, so I decided to add the reference to `profusion_sdk_addon.mk` in the `/device/generic/car/sdk_car_x86_64.mk`, but you may add it to whichever device you are using. Simply add:
 
 ```make
 $(call inherit-product, $(SRC_TARGET_DIR)/product/profusion_sdk_addon/profusion_sdk_addon.mk)
 ```
 
 ### Building the SDK addon
-The SDK Add-on is all set. Now we only have to build it. Notice, again, that I'm using `aosp_x86_64`:
+The SDK Add-on is all set. Now we only have to build it. Notice, again, that I'm using `sdk_car_x86_64`:
 
 ```bash
 . build/envsetup.sh
 export TARGET=profusion_sdk_addon
-lunch aosp_x86_64-eng
-make -j 4 sdk_addon
+lunch sdk_car_x86_64-trunk_staging-eng
+make sdk_addon
 ```
 
-When the compilation succeeds, the SDK Add-on `.zip` will be in `out/host/linux-x86/sdk_addon/profusion_sdk_addon-eng.user-linux-x86.zip`
+When the compilation succeeds, you will see two `.zip` files at `out/host/linux-x86/sdk_addon`. `profusion_sdk_addon-linux.zip` will contain the addon itself, which will be used to develop and compile our app. `profusion_sdk_addon-linux-img.zip` will contain a set of files to run the emulator outside the AOSP file tree.
 
 ### Building Android
 
@@ -279,13 +275,11 @@ To build Android containing the library that we want to supply, do
 
 ```bash
 # . build/envsetup.sh if you are doing it on a new shell
-lunch aosp_x86_64-eng
+lunch sdk_car_x86_64-trunk_staging-eng
 m
 ```
 
 ## Adding the SDK Add-on to Android Studio
-
-Create a path on your Android SDK for the add-ons, then extract the contents of the add-on `.zip` file. You will need to rename the directory using the names defined in the "localPackage path" in the `package.xml`.
 
 Check the environment variable that points to Android's Sdk root.
 
@@ -299,22 +293,24 @@ If the variable is empty, you must define the path to your `Android/Sdk` directo
 export ANDROID_SDK_ROOT=~/Android/Sdk # default location
 ```
 
+Then, create a folder on your Android SDK for the add-ons. Afterward, extract the content of `profusion_sdk_addon-linux.zip` to a directory that matches the name defined at "localPackage" property of `packages.xml`.
 
 ```bash
-mkdir -p "$ANDROID_SDK_ROOT"/add-ons # or ~/Android/Sdk
-unzip out/host/linux-x86/sdk_addon/profusion_sdk_addon-eng.$USER-linux-x86.zip -d /path/to/Sdk/add-ons/
-mv /path/to/Sdk/add-ons/profusion_sdk_addon-eng.user-linux-x86/ "$ANDROID_SDK_ROOT"/add-ons/addon-profusionaddon-profusion-30/
+mkdir -p "$ANDROID_SDK_ROOT"/add-ons # or ~/Android/Sdk/add-ons
+unzip out/host/linux-x86/sdk_addon/profusion_sdk_addon-linux.zip -d "$ANDROID_SDK_ROOT"/add-ons
+mv "$ANDROID_SDK_ROOT"/add-ons/profusion_sdk_addon-linux/ "$ANDROID_SDK_ROOT"/add-ons/addon-profusionaddon-profusion-34/
+rm -rf "$ANDROID_SDK_ROOT"/add-ons/profusion_sdk_addon-linux # delete intermediate folder
 ```
 
 Open Android Studio and go to Tools -> SDK Manager. Check the "Show Package Details" checkbox then you will be able to see the SDK Add-on for the API level configured.
-![SDK Manager containing the SDK Add-on](sdkmanager.png)
+![SDK Manager containing the SDK Add-on](assets/sdkmanager.png)
 
 ## Using the SDK Add-on in an application
 
 To use the SDK Add-on, you must first change the `compileSdkVersion` on the `build.gradle` to the vendor name, along with the add-on name and the API level - as defined in the `manifest.ini` - all separated by colons. In your case, it will look like this:
 ```code
 ...
-  compileSdkVersion 'Profusion:ProfusionAddOn:30'
+  compileSdkVersion 'Profusion:ProfusionAddOn:34'
 ...
 ```
 
@@ -383,6 +379,7 @@ Make sure to include the following in your `AndroidManifest.xml` under the appli
 
 ```xml
     <application
+        >
         ...
         <uses-library android:name="helloworld"
             android:required="true" />
@@ -393,12 +390,30 @@ Make sure to include the following in your `AndroidManifest.xml` under the appli
 And that's it!
 
 ## Running on the emulator
+### Inside the AOSP tree
 
 After build, you can run the emulator in the terminal where you set up the environment variables with
 
 ```
 emulator
 ```
+
+### Outside the AOSP tree
+
+If you use a remote server to build your addon (It could be a good idea. Building the AOSP right now could be a really really hard job for some hardware) you will probably want to extract the emulator to your local machine. Actually, that's very easy and you already have all you need.
+
+Go to your Android Studio and create an emulator using the *Device Manager* tool. Since we builded to a Automotive TARGET, select an hardware under the _Automotive_ category as well. For the _system image_, select (or download first if you don't have it yet) the API 34 image.
+
+Before launching the emulator, extract the content of `profusion_sdk_addon-linux-img.zip` to the API 34 image folder:
+
+```bash
+unzip out/host/linux-x86/sdk_addon/profusion_sdk_addon-linux-img.zip -d $ANDROID_SDK_ROOT/system-images/android-34-ext9/android-automotive
+```
+
+---
+Note: If you choose to build a different TARGET like `aosp_x86_64` or another, you will need to extract the content to a different path and the `profusion_sdk_addon-linux-img.zip` could not work as expected. In that case, you could use `make emu_img_zip` to generate a similar `sdk-repo-linux-system-images.zip` under `$PRODUCT_OUT` folder.
+
+---
 
 ### Build and install the App
 
@@ -424,7 +439,7 @@ If you run the application and then check the `logcat` searching for "HelloWorld
 ```bash
 adb shell
 # logcat | grep -i HelloWorldService
-3261  3279 D HelloWorldService: Hello World.
+6002  6020 D HelloWorldService: Hello World.
 ```
 
-![Android emulator running the helloworld app and helloword service](running_app.png "Helloworld App")
+![Android emulator running the helloworld app and helloword service](assets/running_app.png "Helloworld App")
