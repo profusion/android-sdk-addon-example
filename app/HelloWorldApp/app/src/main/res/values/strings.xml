@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">HelloWorldApp</string>
+    <string name="helloWorldButtonText">Tap to call HelloWorldService!</string>
+</resources>

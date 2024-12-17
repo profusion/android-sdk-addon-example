@@ -307,10 +307,10 @@ Open Android Studio and go to Tools -> SDK Manager. Check the "Show Package Deta
 
 ## Using the SDK Add-on in an application
 
-To use the SDK Add-on, you must first change the `compileSdkVersion` on the `build.gradle` to the vendor name, along with the add-on name and the API level - as defined in the `manifest.ini` - all separated by colons. In your case, it will look like this:
+To use the SDK Add-on, you must first use a `compileSdk` on the `build.gradle` that matches the API level of your addon (in our case, 34). Then you need to add the path to the add-ons folder on the `dependencies` block:
 ```code
 ...
-  compileSdkVersion 'Profusion:ProfusionAddOn:34'
+  implementation(fileTree(mapOf("dir" to "${android.sdkDirectory.path}/add-ons", "include" to listOf("**/*.jar"))))
 ...
 ```
 
@@ -321,55 +321,70 @@ Below is an example of an application using the HelloWorldService:
 ##### `MainActivity.kt`
 
 ```kotlin
-package com.profusion.helloworldapplication
-
-import android.app.Activity
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.Bundle
-import android.os.IBinder
-import android.os.RemoteException
-import android.util.Log
+package com.example.helloworldapp
+...
 import com.profusion.helloworld.IHelloWorldService
 
-const val HELLOWORLD_SERVICE_PACKAGE = "com.profusion.helloworld"
-const val HELLOWORLD_SERVICE = "$HELLOWORLD_SERVICE_PACKAGE.HelloWorldService"
+const val HELLO_WORLD_SERVICE_PACKAGE = "com.profusion.helloworld"
+const val HELLO_WORLD_SERVICE = "$HELLO_WORLD_SERVICE_PACKAGE.HelloWorldService"
 const val TAG = "HelloWorldApplication"
 
-class MainActivity : Activity() {
-    private var mService: IHelloWorldService? = null
+class MainActivity : ComponentActivity() {
+    private var helloWorldService: IHelloWorldService? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        enableEdgeToEdge()
+        setContent {
+            HelloWorldAppTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    MainContent(
+                        modifier = Modifier.padding(innerPadding),
+                        onButtonClick = {
+                            helloWorldService?.printHelloWorld()
+                        }
+                    )
+                }
+            }
+        }
     }
 
     override fun onStart() {
         super.onStart()
         val intent = Intent()
-        intent.component = ComponentName(HELLOWORLD_SERVICE_PACKAGE, HELLOWORLD_SERVICE)
+        intent.component = ComponentName(HELLO_WORLD_SERVICE_PACKAGE, HELLO_WORLD_SERVICE)
         try {
-            this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
+            this.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         } catch (e: Exception) {
             Log.e(TAG, "Unable to bind HelloWorldService");
             e.printStackTrace()
         }
     }
 
-    private val mConnection = object : ServiceConnection {
+    private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            mService = IHelloWorldService.Stub.asInterface(service)
-            try {
-                mService?.printHelloWorld()
-            } catch (e: RemoteException) {
-                Log.e(TAG, "HelloWorldService request failed");
-                e.printStackTrace()
-            }
+            helloWorldService = IHelloWorldService.Stub.asInterface(service)
         }
 
         override fun onServiceDisconnected(className: ComponentName) {
-            mService = null
+            helloWorldService = null
+        }
+    }
+}
+
+@Composable
+fun MainContent(modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Button(
+            onClick = onButtonClick,
+        ) {
+            Text(
+                stringResource(R.string.helloWorldButtonText),
+                fontSize = 32.sp,
+            )
         }
     }
 }
@@ -420,16 +435,16 @@ Note: If you choose to build a different TARGET like `aosp_x86_64` or another, y
 After including the SDK Addon that we created in the correct directory under your `$ANDROID_SDK_HOME`, you can build the app with Android Studio _Build > Make Project_, or with command line:
 
 ```bash
-cd app/HelloWorldApplication
+cd app/HelloWorldApp
 ./gradlew installDebug
 ```
 
 or
 
 ```bash
-cd app/HelloWorldApplication
+cd app/HelloWorldApp
 ./gradlew build
-adb install app/build/outputs/apk/release/app-release-unsigned.apk
+adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ### Running the app
