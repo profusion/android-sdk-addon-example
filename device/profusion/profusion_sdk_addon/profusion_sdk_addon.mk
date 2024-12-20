@@ -11,6 +11,12 @@ PRODUCT_SDK_ADDON_NAME := profusion_sdk_addon
 INTERNAL_SDK_HOST_OS_NAME := $(HOST_OS)
 
 PRODUCT_PACKAGES := \
+    libvsomeip \
+    libvsomeip_cfg \
+    libvsomeip_sd \
+    libvsomeip_e2e \
+    libCommonAPI \
+    libCommonAPI-SomeIP \
     helloworld \
     profusion.hardware.dummy_car_info_hal-service \
     DummyCarInfoManager

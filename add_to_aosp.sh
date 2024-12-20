@@ -26,4 +26,7 @@ rsync -a --inplace "$GIT_ROOT"/hardware "$AOSP"
 
 mkdir -p "$AOSP"/out/target/product/emulator_car64_x86_64/data
 
+echo "Copying COMMONAPI libs"
+rsync -a --exclude '.git' "$GIT_ROOT"/libs/ "$AOSP"/external
+
 date '+%Y/%m/%d %H:%M:%S'
