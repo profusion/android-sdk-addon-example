@@ -23,4 +23,8 @@ rsync -a --inplace "$GIT_ROOT"/packages "$AOSP"
 
 mkdir -p "$AOSP"/out/target/product/emulator_car64_x86_64/data
 
+echo "Copying SOME/IP libs"
+rsync -a --exclude '.git' "$GIT_ROOT"/libs/temp/ "$AOSP"/external/sdv/vsomeip/third_party
+cp "$GIT_ROOT"/libs/boost_Android.bp "$AOSP"/external/sdv/vsomeip/third_party/boost/Android.bp
+
 date '+%Y/%m/%d %H:%M:%S'

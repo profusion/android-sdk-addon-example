@@ -11,7 +11,13 @@ PRODUCT_SDK_ADDON_NAME := profusion_sdk_addon
 INTERNAL_SDK_HOST_OS_NAME := $(HOST_OS)
 
 PRODUCT_PACKAGES := \
-    helloworld
+    helloworld \
+    libvsomeip \
+    libvsomeip_cfg \
+    libvsomeip_sd \
+    libvsomeip_e2e \
+    libCommonAPI \
+    libCommonAPI-SomeIP
 
 # Copy the manifest and hardware files for the SDK add-on.
 PRODUCT_SDK_ADDON_COPY_FILES := \
