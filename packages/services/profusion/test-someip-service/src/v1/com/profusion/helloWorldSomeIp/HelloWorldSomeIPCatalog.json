@@ -1,0 +1,8 @@
+{
+    "com.profusion.helloWorldSomeIp.HelloWorld" : {
+        "service_id": 4660,
+        "instances" : {
+            "com.profusion.helloWorldSomeIp.HelloWorld": 4660
+        }
+    }
+}
