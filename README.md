@@ -355,8 +355,7 @@ class MainActivity : ComponentActivity() {
         try {
             this.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         } catch (e: Exception) {
-            Log.e(TAG, "Unable to bind HelloWorldService");
-            e.printStackTrace()
+            Log.e(TAG, "Unable to bind HelloWorldService", e)
         }
     }
 
