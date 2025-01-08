@@ -12,9 +12,12 @@
 	<display>ProfusionAddOn</display>
       </tag>
       <libraries>
-	<library localJarPath="helloworld.jar" name="helloworld">
-	  <description>Hello World Library</description>
-	</library>
+        <library localJarPath="helloworld.jar" name="helloworld">
+          <description>Hello World Library</description>
+        </library>
+        <library localJarPath="DummyCarInfoManager.jar" name="DummyCarInfoManager">
+          <description>Dummy Car Info Library</description>
+        </library>
       </libraries>
     </type-details>
     <revision>

@@ -1,0 +1,91 @@
+android_app {
+    name: "dummyCarInfoService",
+    platform_apis: true,
+    srcs: [
+        "src/com/profusion/dummyCarInfo/DummyCarInfoService.java",
+        "src/com/profusion/dummyCarInfo/IDummyCarInfoService.aidl"
+    ],
+    dex_preopt: {
+        enabled: false,
+    },
+    static_libs: [
+        "profusion.hardware.dummy_car_info_hal-V1-java",
+    ],
+    certificate: "platform",
+    vintf_fragments: [
+        "dummyCarInfo-service.xml",
+    ],
+}
+
+prebuilt_etc {
+    name: "permissions.xml",
+
+    src: "permissions.xml",
+    sub_dir: "permissions",
+}
+
+
+java_sdk_library {
+    name: "DummyCarInfoManager",
+    installable: true,
+    required: ["permissions.xml"],
+    srcs: [
+        "src/com/profusion/dummyCarInfo/DummyCarInfoManager.java",
+    ],
+    optimize: {
+        enabled: false,
+    },
+    static_libs: [
+        "dummyCarInfoService",
+        "profusion.hardware.dummy_car_info_hal-V1-java",
+    ],
+}
+
+javadoc {
+    name: "dummyCarInfo-doc",
+    srcs: [
+        "src/com/profusion/dummyCarInfo/DummyCarInfoManager.java",
+    ]
+}
+
+filegroup {
+    name: "DummyCarInfoManager.api.public.latest",
+    srcs: [
+        "api/current.txt",
+    ],
+}
+
+filegroup {
+    name: "DummyCarInfoManager-removed.api.public.latest",
+    srcs: [
+        "api/removed.txt",
+    ],
+}
+
+filegroup {
+    name: "DummyCarInfoManager.api.system.latest",
+    srcs: [
+        "api/system-current.txt",
+    ],
+}
+
+filegroup {
+    name: "DummyCarInfoManager-removed.api.system.latest",
+    srcs: [
+        "api/system-removed.txt",
+    ],
+}
+
+filegroup {
+    name: "DummyCarInfoManager-incompatibilities.api.public.latest",
+    srcs: [
+        "api/incompatibilities.txt",
+    ],
+}
+
+filegroup {
+    name: "DummyCarInfoManager-incompatibilities.api.system.latest",
+    srcs: [
+        "api/system-incompatibilities.txt",
+    ],
+}

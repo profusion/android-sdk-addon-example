@@ -1,0 +1,11 @@
+// Signature format: 2.0
+package com.profusion.dummyCarInfo {
+
+  public class DummyCarInfoManager {
+    ctor public DummyCarInfoManager(android.content.Context);
+    method public String getCarInfo() throws java.lang.Exception;
+    method public void unbindService();
+  }
+
+}
+
