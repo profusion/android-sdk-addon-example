@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.profusion.dummyCarInfo">
+
+    <application android:label="Dummy Car Info Service"
+                 android:directBootAware="true">
+        <service android:name=".DummyCarInfoService"
+                 android:exported="true" >
+        </service>
+    </application>
+</manifest>

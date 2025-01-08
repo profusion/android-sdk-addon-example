@@ -12,7 +12,8 @@ INTERNAL_SDK_HOST_OS_NAME := $(HOST_OS)
 
 PRODUCT_PACKAGES := \
     helloworld \
-    profusion.hardware.dummy_car_info-service
+    profusion.hardware.dummy_car_info_hal-service \
+    DummyCarInfoManager
 
 # Copy the manifest and hardware files for the SDK add-on.
 PRODUCT_SDK_ADDON_COPY_FILES := \
@@ -32,7 +33,8 @@ DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
 
 # Copy the jar files for the optional libraries that are exposed as APIs.
 PRODUCT_SDK_ADDON_COPY_MODULES := \
-    helloworld:libs/helloworld.jar
+    helloworld:libs/helloworld.jar \
+    DummyCarInfoManager:libs/DummyCarInfoManager.jar
 
 # Rules for public APIs
 PRODUCT_SDK_ADDON_STUB_DEFS := $(LOCAL_PATH)/sdk_addon_stub_defs.txt

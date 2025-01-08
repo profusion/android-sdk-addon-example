@@ -8,5 +8,6 @@ binder_call(dummy_car_info_hal, hwservicemanager)
 allow dummy_car_info_hal servicemanager:binder { call transfer };
 
 allow system_app dummy_car_info_hal:binder { call };
+allow platform_app dummy_car_info_hal:binder { call };
 
 domain_auto_trans(init, dummy_car_info_hal_exec, dummy_car_info_hal)

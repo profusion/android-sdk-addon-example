@@ -1,1 +1,2 @@
 +com.profusion.helloworld.*
++com.profusion.dummyCarInfo.*
