@@ -458,3 +458,10 @@ adb shell
 ```
 
 ![Android emulator running the helloworld app and helloword service](assets/running_app.png "Helloworld App")
+
+
+### HAL
+To freeze the AIDL files:
+```bash
+m update-api
+```

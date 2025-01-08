@@ -18,8 +18,11 @@ rsync -a --inplace "$GIT_ROOT"/target/userdata.img "$AOSP"/device/generic/goldfi
 echo "Copying profusion sdk addon to device"
 rsync -a --inplace "$GIT_ROOT"/device "$AOSP"
 
-echo "Copying helloworld service to the framework"
+echo "Copying services to the framework"
 rsync -a --inplace "$GIT_ROOT"/packages "$AOSP"
+
+echo "Copying HALs to the hardware"
+rsync -a --inplace "$GIT_ROOT"/hardware "$AOSP"
 
 mkdir -p "$AOSP"/out/target/product/emulator_car64_x86_64/data
 
