@@ -1,0 +1,38 @@
+cc_library_static {
+    name: "profusion.hardware.dummy_car_info_hal-lib",
+    srcs: [
+        "DummyCarInfoHAL.cpp",
+        "service.cpp",
+    ],
+    export_include_dirs: [
+        "include",
+    ],
+    shared_libs: [
+        "profusion.hardware.dummy_car_info_hal-V1-ndk",
+        "libbase",
+        "liblog",
+        "libbinder_ndk",
+    ],
+    vendor: true,
+}
+
+cc_binary {
+    name: "profusion.hardware.dummy_car_info_hal-service",
+    relative_install_path: "hw",
+    init_rc: ["dummy_car_info-default.rc"],
+    vintf_fragments: ["dummy_car_info-default.xml"],
+    srcs: [
+        "DummyCarInfoHAL.cpp",
+        "service.cpp",
+    ],
+    static_libs: [
+        "profusion.hardware.dummy_car_info_hal-lib",
+    ],
+    shared_libs: [
+        "profusion.hardware.dummy_car_info_hal-V1-ndk",
+        "libbase",
+        "liblog",
+        "libbinder_ndk",
+    ],
+    vendor: true,
+}

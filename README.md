@@ -458,6 +458,9 @@ adb shell
 
 ![Android emulator running the helloworld app and helloword service](assets/running_app.png "Helloworld App")
 
-### HAL example
 
-There is an example on this repository of how to implement a HAL and expose a Manager through the SDK Add-on. If you want to see more about this, take a look at the [hal_example](https://github.com/profusion/android-sdk-addon-example/tree/hal_example) branch.
+### HAL
+To freeze the AIDL files:
+```bash
+m update-api
+```

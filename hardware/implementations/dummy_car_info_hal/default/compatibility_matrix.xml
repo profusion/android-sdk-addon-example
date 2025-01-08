@@ -1,0 +1,10 @@
+<compatibility-matrix version="1.0" type="framework">
+    <hal format="aidl">
+        <name>profusion.hardware.dummy_car_info_hal</name>
+        <version>1</version>
+        <interface>
+        	<name>IDummyCarInfoHAL</name>
+        	<instance>default</instance>
+        </interface>
+    </hal>
+</compatibility-matrix>

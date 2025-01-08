@@ -1,0 +1,19 @@
+package {
+    default_applicable_licenses: ["hardware_interfaces_license"],
+}
+
+aidl_interface {
+    name: "profusion.hardware.dummy_car_info_hal",
+    srcs: ["profusion/hardware/dummy_car_info_hal/*.aidl"],
+    stability: "vintf",
+    vendor_available: true,
+    backend: {
+        cpp: {
+            enabled: false,
+        },
+        java: {
+            sdk_version: "module_current",
+        },
+    },
+    owner: "Profusion",
+}

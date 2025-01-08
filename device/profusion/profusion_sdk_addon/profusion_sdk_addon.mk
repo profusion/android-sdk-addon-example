@@ -11,7 +11,8 @@ PRODUCT_SDK_ADDON_NAME := profusion_sdk_addon
 INTERNAL_SDK_HOST_OS_NAME := $(HOST_OS)
 
 PRODUCT_PACKAGES := \
-    helloworld
+    helloworld \
+    profusion.hardware.dummy_car_info-service
 
 # Copy the manifest and hardware files for the SDK add-on.
 PRODUCT_SDK_ADDON_COPY_FILES := \
@@ -22,6 +23,12 @@ PRODUCT_SDK_ADDON_COPY_FILES := \
 # Define the IMAGE PROPERTY (emulator related, but needed to build)
 PRODUCT_SDK_ADDON_SYS_IMG_SOURCE_PROP := $(LOCAL_PATH)/source.properties
 
+BOARD_SEPOLICY_DIRS += \
+    device/profusion/sepolicy/daemon \
+    device/profusion/sepolicy/interface
+
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
+	hardware/implementations/dummy_car_info_hal/default/compatibility_matrix.xml
 
 # Copy the jar files for the optional libraries that are exposed as APIs.
 PRODUCT_SDK_ADDON_COPY_MODULES := \

@@ -1,0 +1,5 @@
+service profusion.hardware.dummy_car_info_hal-service /vendor/bin/hw/profusion.hardware.dummy_car_info_hal-service
+    interface aidl profusion.hardware.dummy_car_info_hal.IDummyCarInfoHAL/default
+    class hal
+    user nobody
+    group nobody

@@ -1,0 +1,12 @@
+type dummy_car_info_hal, domain;
+type dummy_car_info_hal_exec, exec_type, file_type, vendor_file_type;
+
+init_daemon_domain(dummy_car_info_hal)
+
+binder_call(dummy_car_info_hal, hwservicemanager)
+
+allow dummy_car_info_hal servicemanager:binder { call transfer };
+
+allow system_app dummy_car_info_hal:binder { call };
+
+domain_auto_trans(init, dummy_car_info_hal_exec, dummy_car_info_hal)
