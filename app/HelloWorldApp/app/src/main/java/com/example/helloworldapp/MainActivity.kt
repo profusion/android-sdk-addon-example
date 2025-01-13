@@ -18,12 +18,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.helloworldapp.ui.theme.HelloWorldAppTheme
 import com.profusion.helloworld.IHelloWorldService
+import com.profusion.dummyCarInfo.DummyCarInfoManager
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -33,31 +39,49 @@ class MainActivity : ComponentActivity() {
     }
 
     private var helloWorldService: IHelloWorldService? = null
+    private var dummyCarInfoManager: DummyCarInfoManager? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            var carInfoState by remember { mutableStateOf("") }
+
             HelloWorldAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MainContent(
                         modifier = Modifier.padding(innerPadding),
-                        onButtonClick = {
+                        onHelloWorldButtonClick = {
                             helloWorldService?.printHelloWorld()
-                        }
+                        },
+                        onCarInfoButtonClick = {
+                            carInfoState = try {
+                                dummyCarInfoManager!!.carInfo
+                            } catch (e: Exception) {
+                                "Error: ${e.message}"
+                            }
+                        },
+                        carInfoState = carInfoState,
                     )
                 }
             }
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        dummyCarInfoManager?.unbindService();
+    }
+
     override fun onStart() {
         super.onStart()
+        dummyCarInfoManager = DummyCarInfoManager(this)
         val intent = Intent()
         intent.component = ComponentName(HELLO_WORLD_SERVICE_PACKAGE, HELLO_WORLD_SERVICE)
         try {
             this.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         } catch (e: Exception) {
-            Log.e(TAG, "Unable to bind HelloWorldService", e)
+            Log.e(TAG, "Unable to bind");
+            e.printStackTrace()
         }
     }
 
@@ -73,19 +97,37 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainContent(modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+fun MainContent(
+    modifier: Modifier = Modifier,
+    onHelloWorldButtonClick: () -> Unit,
+    onCarInfoButtonClick: () -> Unit,
+    carInfoState: String,
+) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Button(
-            onClick = onButtonClick,
+            onClick = onHelloWorldButtonClick,
         ) {
             Text(
                 stringResource(R.string.helloWorldButtonText),
                 fontSize = 32.sp,
             )
         }
+        Button(
+            modifier = Modifier.padding(vertical = 16.dp),
+            onClick = onCarInfoButtonClick,
+        ) {
+            Text(
+                stringResource(R.string.carInfoButtonText),
+                fontSize = 32.sp,
+            )
+        }
+        Text(
+            text = carInfoState,
+            fontSize = 32.sp,
+        )
     }
 }

@@ -12,6 +12,8 @@
         android:theme="@style/Theme.HelloWorldApp">
         <uses-library android:name="helloworld"
             android:required="true" />
+        <uses-library android:name="DummyCarInfoManager"
+            android:required="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
