@@ -4,7 +4,7 @@ Whether you are an OEM company or a developer customizing the Android Open Sourc
 
 The Android Software Development Kit (SDK) is a collection of libraries and tools that enables and makes it easier to develop Android applications. SDK Add-ons allow third-party actors to extend the Android SDK to add interfaces to their features without changing the Android SDK. According to the Android Compatibility Definition Document (CDD), OEMs are not allowed to change the Android public APIs - namely those in the protected namespaces: `java.*`, `javax.*`, `sun.*`, `android.*`, `com.android.*`. Therefore, by using add-ons, OEMs can add libraries in their namespaces, providing functionalities that can be exported without infringing the CDD. Having to build only the add-on is also a great advantage that might save a lot of development time.
 
-In this post, we will build an SDK Add-on containing an example service - for which we will cover all the necessary config files. We will also learn how to connect an application to our example service using the add-on. Here, we are assuming you already have access to the Android source code and that you can build and deploy these changes. The code and configuration files were made with Android 10 (API level 30) in mind but they can be easily modifiable to work with other versions.
+In this project, we will build an SDK Add-on containing example services - for which we will cover all the necessary config files. We will also learn how to connect an application to our example services using the add-on. Here, we are assuming you already have access to the Android source code and that you can build and deploy these changes. The code and configuration files were made with Android 14 (API level 34) in mind but they can be easily modifiable to work with other versions.
 
 ## Setting up the AOSP source tree
 
@@ -19,7 +19,7 @@ repo sync
 
 ### The content of this repository
 
-This repository contains the code to build an emulator image containing the **hello-world-service**, the SDK add-on containing the **hello-world-service** service libraries that apps that use the **hello-world-service** will use on theirs build process, and a sample app that will use the SDK add-on. The summary of the code follows:
+This repository contains the code to build an emulator image containing some services, the SDK add-on with stubs that allow apps to communicate with these services, and a sample app that will use the SDK add-on. First, let's see how the **hello-world-service** example is structured:
 
 * `device/profusion/profusion_sdk_addon`: contains the configuration and manifest files for the SDK add-on. The `profusion_sdk_addon.mk` includes the **helloworld** product as part of this add-on;
 * `pacakges/services/profusion/hello-world-service`: contains the service itself, that will be run in the emulator and serve the applications. The service will be part of the framework;
@@ -34,7 +34,9 @@ We supply a shell script `add_to_aosp.sh` to automatically copy all code to the 
 
 If you use VSCode, you can use [Run on Save](https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave) to automatically update the files with this script on save.
 
+#### Sample HAL implementation
 
+This repository also contains an example of how to develop a HAL and use it through the SDK-Addon. First, focus on how the **hello-world-service** example is described here. Then, take a look at the [HAL Documentation](doc/HAL.md).
 
 ## Hello World System Service
 
@@ -143,6 +145,8 @@ Should contain commands that the blueprint cannot support. Since Android 11, the
 ## SDK Add-on configs
 If you already have a service, then this is the interesting part:
 You need a `.mk` file that defines the name and properties of your SDK Add-on, and several other files that define miscellaneous properties such as the API level being used, the revision version, and the libraries contained in the add-on. During the Android build, these files are bundled into a `.zip` containing the add-on to be distributed. In the next sections, I will go into further detail into each of the included files.
+
+**PS**: Here, we will only show the files with the HelloWorld service. But if you look at these files in the source itself, you will see how to add more Services/Managers to the add-on.
 
 ##### `profusion_sdk_addon.mk`
 
@@ -264,10 +268,11 @@ The SDK Add-on is all set. Now we only have to build it. Notice, again, that I'm
 . build/envsetup.sh
 export TARGET=profusion_sdk_addon
 lunch sdk_car_x86_64-trunk_staging-eng
+m profusion.hardware.dummy_car_info_hal-update-api # to freeze AIDL interfaces from HAL example
 make sdk_addon
 ```
 
-When the compilation succeeds, you will see two `.zip` files at `out/host/linux-x86/sdk_addon`. `profusion_sdk_addon-linux.zip` will contain the addon itself, which will be used to develop and compile our app. `profusion_sdk_addon-linux-img.zip` will contain a set of files to run the emulator outside the AOSP file tree.
+When the compilation succeeds, you will see two `.zip` files at `out/host/linux-x86/sdk_addon`. `profusion_sdk_addon-linux.zip` will contain the addon itself, which will be used to develop and compile our app. `profusion_sdk_addon-linux-img.zip` will supposedly contain the files to run an emulator. We will see how to use it later.
 
 ### Building Android
 
@@ -278,6 +283,8 @@ To build Android containing the library that we want to supply, do
 lunch sdk_car_x86_64-trunk_staging-eng
 m
 ```
+
+**Tip**: Sometimes, you may want to build only one specific module (the hello-world-service, for example) to test small changes. To do this, run `mmm packages/hello-world-service`.
 
 ## Adding the SDK Add-on to Android Studio
 
@@ -414,20 +421,27 @@ emulator
 
 ### Outside the AOSP tree
 
-If you use a remote server to build your addon (It could be a good idea. Building the AOSP right now could be a really really hard job for some hardware) you will probably want to extract the emulator to your local machine. Actually, that's very easy and you already have all you need.
+If you use a remote server to build your addon (It could be a good idea. Building the AOSP right now could be a really really hard job for some hardware) you will probably want to extract the emulator to your local machine. The `profusion_sdk_addon-linux-img.zip` generated by the build process should contain the emulator image, but I had trouble running it. So, we will use another make command to generate the image:
+
+```bash
+make emu_img_zip
+```
+
+This command will pack all the necessary files to create an emulator in a file called `sdk-repo-linux-system-images.zip` under the `out/target/product/emulator_car64_x86_64` folder. Copy this file to your local machine. This usually can be done with a `scp` command, like:
+
+```bash
+scp <remote-user>@<server-ip>:<aosp-path-on-remote>/out/target/product/emulator_car64_x86_64/sdk-repo-linux-system-images.zip <local-path-were-you-want-to-save>
+```
 
 Go to your Android Studio and create an emulator using the *Device Manager* tool. Since we builded to a Automotive TARGET, select an hardware under the _Automotive_ category as well. For the _system image_, select (or download first if you don't have it yet) the API 34 image.
 
-Before launching the emulator, extract the content of `profusion_sdk_addon-linux-img.zip` to the API 34 image folder:
+Before launching the emulator, extract the content of `sdk-repo-linux-system-images.zip` to the API 34 image folder:
 
 ```bash
-unzip out/host/linux-x86/sdk_addon/profusion_sdk_addon-linux-img.zip -d $ANDROID_SDK_ROOT/system-images/android-34-ext9/android-automotive
+unzip pathTo/sdk-repo-linux-system-images.zip -d $ANDROID_SDK_ROOT/system-images/android-34-ext9/android-automotive
 ```
 
----
-Note: If you choose to build a different TARGET like `aosp_x86_64` or another, you will need to extract the content to a different path and the `profusion_sdk_addon-linux-img.zip` could not work as expected. In that case, you could use `make emu_img_zip` to generate a similar `sdk-repo-linux-system-images.zip` under `$PRODUCT_OUT` folder.
-
----
+And that's it! You can now run the emulator and test the features.
 
 ### Build and install the App
 
@@ -458,9 +472,7 @@ adb shell
 
 ![Android emulator running the helloworld app and helloword service](assets/running_app.png "Helloworld App")
 
+### Next steps
 
-### HAL
-To freeze the AIDL files:
-```bash
-m update-api
-```
+Now you know how to build an SDK Add-on with a simple hello world service example. You can use this to develop your service!
+Also, I **highly recommend** you read the [HAL Documentation](doc/HAL.md). There, you will find and robust example of how to develop a Hardware Abstraction Layer service and use it through the SDK Add-on using Managers, removing the Service binding responsibility from the application.
