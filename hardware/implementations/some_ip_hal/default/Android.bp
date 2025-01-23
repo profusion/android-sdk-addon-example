@@ -1,0 +1,55 @@
+cc_defaults {
+    name: "some_ip_playground-defaults",
+    vendor: true,
+    rtti: true,
+    cppflags: [
+        "-fexceptions",
+        "-Wall",
+        "-Werror",
+        "-Wno-ignored-attributes",
+        "-Wno-unused-parameter",
+        "-Wno-overloaded-virtual",
+        "-DCOMMONAPI_INTERNAL_COMPILATION",
+    ],
+
+    shared_libs: [
+        "libvsomeip3-cfg",
+        "libvsomeip3",
+        "libCommonAPI",
+        "libCommonAPI-SomeIP",
+        "libbase",
+    ],
+}
+
+runtime_required = [
+    "some_ip_playground-vsomeip.json",
+]
+
+prebuilt_etc {
+    name: "some_ip_playground-vsomeip.json",
+    vendor: true,
+    sub_dir: "some_ip_playground",
+    src: "vsomeip.json",
+    filename:"vsomeip.json"
+}
+
+cc_binary {
+    name: "some_ip_playground-service",
+    defaults: [
+        "some_ip_playground-defaults",
+    ],
+    init_rc: ["playground_service/some_ip_playground-init.rc"],
+    local_include_dirs: [
+        "playground_service/mock",
+        "include",
+    ],
+    srcs: [
+        "playground_service/PlaygroundService.cpp",
+        "playground_service/PlaygroundStubImpl.cpp",
+        "include/v1/org/genivi/vehicle/playground/PlaygroundSomeIPDeployment.cpp",
+        "include/v1/org/genivi/vehicle/playground/PlaygroundSomeIPStubAdapter.cpp",
+        "playground_service/mock/MockedAttributes.cpp",
+    ],
+    required: runtime_required,
+    vendor: true,
+}

@@ -1,0 +1,118 @@
+/*
+* Copyright (C) 2021, Bayerische Motoren Werke Aktiengesellschaft (BMW AG),
+*   Author: Alexander Domin (Alexander.Domin@bmw.de)
+* Copyright (C) 2021, ProFUSION Sistemas e Soluções LTDA,
+*   Author: Leonardo Ramos (leo.ramos@profusion.mobi)
+*
+* SPDX-License-Identifier: MPL-2.0
+*
+* This Source Code Form is subject to the terms of the
+* Mozilla Public License, v. 2.0. If a copy of the MPL was
+* not distributed with this file, You can obtain one at
+* http://mozilla.org/MPL/2.0/.
+*/
+
+package org.genivi.vehicle.playground
+  import org.genivi.vehicle.playgroundtypes.* from "playgroundTypes.fidl"
+  interface Playground {
+    version {
+      major 1
+      minor 0
+    }
+    <**
+      @description : Current consumption in liters per 100 km
+    **>
+    attribute Float consumption readonly
+    <**
+      @description : Capacity of the fuel tank in milliliters
+      Unit: ml
+    **>
+    attribute UInt8 capacity readonly noSubscriptions
+    <**
+      @description : Current volume of fuel in the tank in liters
+    **>
+    attribute Float volume readonly noSubscriptions
+    <**
+      @description : Engine speed measured as rotations per minute
+    **>
+    attribute UInt16 engineSpeed readonly
+    <**
+      @description : Current gear
+    **>
+    attribute PlaygroundTypes.Gear currentGear readonly
+    <**
+      @description : Is reverse gear selected
+    **>
+    attribute Boolean isReverseGearOn readonly
+    <**
+      @description : Drive Type
+    **>
+    attribute PlaygroundTypes.DriveType drivePowerTransmission readonly
+    <**
+      @description : Report the opening status for each door
+    **>
+    attribute PlaygroundTypes.DoorsStatus doorsOpeningStatus readonly
+    <**
+      @description : Describes the seat heating status set by the user.
+      index 0 == Driver
+      index 1 == Co-Driver
+      index 3 == Passenger in the second row on the Driver side
+      index 4 == Passenger in the second row on the Middle side
+      index 5 == Passenger in the second row on the Co-driver side
+      index 6 == Passenger in the third row on the Driver side
+      index 7 == Passenger in the third row on the Co-driver side
+      Just for demo the some SomeIP service will return values for Driver and Co-Driver only
+    **>
+    attribute Boolean [] seatHeatingStatus
+    <**
+      @description : Describes the seat heating level selected by the user
+      index 0 == Driver
+      index 1 == Co-Driver
+      index 3 == Passenger in the second row on the Driver side
+      index 4 == Passenger in the second row on the Middle side
+      index 5 == Passenger in the second row on the Co-driver side
+      index 6 == Passenger in the third row on the Driver side
+      index 7 == Passenger in the third row on the Co-driver side
+      Just for demo the some SomeIP service will return values for Driver and Co-Driver only
+    **>
+    attribute UInt8 [] seatHeatingLevel
+    <**
+      @description : Trigger tire pressure initialization process
+    **>
+    method initTirePressureCalibration {
+    }
+    <**
+      @description : Trigger the change on doors opening state
+    **>
+    method changeDoorsState {
+      in {
+        <**
+        @description : Commands for closing or opening the doors.
+        **>
+        PlaygroundTypes.CarDoorsCommand commands
+      }
+    }
+    <**
+      @description : Vehicle position data provided by GPS
+    **>
+    broadcast vehiclePosition {
+      out {
+        <**
+          @description : The structure containg the GPS data status informations
+        **>
+        PlaygroundTypes.StatusGPS statusGPS
+      }
+    }
+    <**
+      @description : The current tank volume
+    **>
+    broadcast currentTankVolume {
+      out {
+        <**
+          @description : Current tank volume in liters
+          Unit: l
+        **>
+        UInt8 volume
+      }
+    }
+}

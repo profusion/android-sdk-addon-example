@@ -1,0 +1,28 @@
+/*
+* Copyright (C) 2021, Bayerische Motoren Werke Aktiengesellschaft (BMW AG),
+*   Author: Alexander Domin (Alexander.Domin@bmw.de)
+* Copyright (C) 2021, ProFUSION Sistemas e Soluções LTDA,
+*   Author: Leonardo Ramos (leo.ramos@profusion.mobi)
+*
+* SPDX-License-Identifier: MPL-2.0
+*
+* This Source Code Form is subject to the terms of the
+* Mozilla Public License, v. 2.0. If a copy of the MPL was
+* not distributed with this file, You can obtain one at
+* http://mozilla.org/MPL/2.0/.
+*/
+
+import "platform:/plugin/org.genivi.commonapi.someip/deployment/CommonAPI-SOMEIP_deployment_spec.fdepl"
+import "../org/genivi/vehicle/playground.fdepl"
+import "../org/genivi/vehicle/playground.fidl"
+
+define org.genivi.commonapi.someip.deployment for provider as
+org.genivi.vehicle.playground {
+  instance org.genivi.vehicle.playground.Playground as PlaygroundInst1 {
+    SomeIpInstanceID = 1
+    InstanceId = "1"
+    SomeIpUnicastAddress = ""
+    SomeIpReliableUnicastPort = 0
+    SomeIpUnreliableUnicastPort = 0
+  }
+}

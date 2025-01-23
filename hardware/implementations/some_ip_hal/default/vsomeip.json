@@ -1,0 +1,21 @@
+{
+    "logging" :
+    {
+        "level" : "debug",
+        "console" : "true",
+        "file" : { "enable" : "false" },
+        "dlt" : "false"
+    },
+    "applications" :
+    [
+        {
+            "name" : "playground-service",
+            "id" : "0x4444"
+        }
+    ],
+    "routing" : "playground-service",
+    "service-discovery" :
+    {
+        "enable" : "false"
+    }
+}

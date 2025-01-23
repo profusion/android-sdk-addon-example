@@ -1,1 +1,2 @@
 /vendor/bin/hw/profusion.hardware.dummy_car_info_hal-service    u:object_r:dummy_car_info_hal_exec:s0
+/vendor/bin/some_ip_playground-service    u:object_r:some_ip_playground-service_exec:s0

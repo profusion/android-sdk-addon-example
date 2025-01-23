@@ -1,0 +1,12 @@
+service some_ip_playground-service /vendor/bin/some_ip_playground-service
+    class main
+    user none
+    group none
+    disabled
+    setenv VSOMEIP_APPLICATION_NAME playground-service
+    setenv VSOMEIP_CONFIGURATION /vendor/etc/some_ip_playground/vsomeip.json
+    setenv VSOMEIP_BASE_PATH /data/vendor/vsomeip/
+
+on property:sys.boot_completed=1
+    mkdir /data/vendor/vsomeip 0771 none none
+    start some_ip_playground-service

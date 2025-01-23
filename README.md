@@ -26,7 +26,13 @@ This repository contains the code to build an emulator image containing some ser
 * `target`: contains files related to the emulator that will be created. Instead of creating a new device, we just modified the `sdk_car_x86_64.mk` and `car_generic_system.mk` to include our add-on.
 
 
-We supply a shell script `add_to_aosp.sh` to automatically copy all code to the correct place in the AOSP source tree. Pass to the script the path to where the AOSP repo is:
+We supply two different shell scripts. The first one, `fetch_someip_libs.sh`, is responsible for cloning all the necessary libraries to work with SOME/IP and CommonAPI. You only need to run this script once. It's also necessary to generate the files of some_ip_hal example to compile the project. So clone the libraries with the script below and run the commands described at [Generating CommonAPI Files](doc/SOME-IP-HAL.md#generating-commonapi-files) (Don't worry about understanding the whole context of SOME/IP right now, just run the commands in this topic for now).
+
+```bash
+./fetch_someip_libs.sh
+```
+
+The second one called `add_to_aosp.sh` will automatically copy all code to the correct place in the AOSP source tree. Run these two scripts one after the other, changing `/pathTo/aosp` for the path to your AOSP source tree:
 
 ```bash
 ./add_to_aosp.sh /pathTo/aosp
@@ -36,7 +42,7 @@ If you use VSCode, you can use [Run on Save](https://marketplace.visualstudio.co
 
 #### Sample HAL implementation
 
-This repository also contains an example of how to develop a HAL and use it through the SDK-Addon. First, focus on how the **hello-world-service** example is described here. Then, take a look at the [HAL Documentation](doc/HAL.md).
+This repository also contains an example of how to develop a HAL and use it through the SDK-Addon. First, focus on how the **hello-world-service** example is described here. Then, take a look at the [HAL Documentation](doc/HAL.md).And then, if you are comfortable going further, take a look at the [HAL using SOME/IP](doc/SOME-IP-HAL.md), which is a more complex example involving a HAL that uses SOME/IP to communicate with a provider service.
 
 ## Hello World System Service
 
