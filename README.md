@@ -307,10 +307,10 @@ Open Android Studio and go to Tools -> SDK Manager. Check the "Show Package Deta
 
 ## Using the SDK Add-on in an application
 
-To use the SDK Add-on, you must first use a `compileSdk` on the `build.gradle` that matches the API level of your addon (in our case, 34). Then you need to add the path to the add-ons folder on the `dependencies` block:
+According to Android Studio, the correct way of using a custom SDK is to pass it as a String to `compileSdkVersion` property following this format: `"vendorName:addonName:api"`, so in our case it should be `"Profusion:ProfusionAddOn:34"`. But I wasn't able to use the addon this way, so I found a 'workaround' on StackOverflow that consists in: you must first use a `compileSdk` on the `build.gradle` that matches the API level of your addon (in our case, 34). Then you need to add the path to the add-ons folder on the `dependencies` block
 ```code
 ...
-  implementation(fileTree(mapOf("dir" to "${android.sdkDirectory.path}/add-ons", "include" to listOf("**/*.jar"))))
+  compileOnly(fileTree(mapOf("dir" to "${android.sdkDirectory.path}/add-ons/addon-profusionaddon-profusion-34", "include" to listOf("**/*.jar"))))
 ...
 ```
 
@@ -457,3 +457,7 @@ adb shell
 ```
 
 ![Android emulator running the helloworld app and helloword service](assets/running_app.png "Helloworld App")
+
+### HAL example
+
+There is an example on this repository of how to implement a HAL and expose a Manager through the SDK Add-on. If you want to see more about this, take a look at the [hal_example](https://github.com/profusion/android-sdk-addon-example/tree/hal_example) branch.

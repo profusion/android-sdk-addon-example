@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "${android.sdkDirectory.path}/add-ons", "include" to listOf("**/*.jar"))))
+    compileOnly(fileTree(mapOf("dir" to "${android.sdkDirectory.path}/add-ons/addon-profusionaddon-profusion-34", "include" to listOf("**/*.jar"))))
     implementation(libs.androidx.core.ktx.v1131)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
