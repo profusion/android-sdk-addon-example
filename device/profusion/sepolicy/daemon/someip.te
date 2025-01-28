@@ -1,0 +1,12 @@
+type some_ip_playground-service, domain;
+type some_ip_playground-service_exec, exec_type, file_type, vendor_file_type;
+
+init_daemon_domain(some_ip_playground-service)
+
+allow some_ip_playground-service sysfs:file { open read };
+allow some_ip_playground-service vendor_data_file:dir { add_name remove_name write };
+allow some_ip_playground-service vendor_data_file:file { create open read write lock };
+allow some_ip_playground-service vendor_data_file:sock_file { create setattr read write unlink};
+allow some_ip_playground-service self:netlink_route_socket { create bind shutdown nlmsg_read nlmsg_readpriv read write };
+allow some_ip_playground-service self:tcp_socket create;
+allow some_ip_playground-service self:udp_socket { create ioctl };

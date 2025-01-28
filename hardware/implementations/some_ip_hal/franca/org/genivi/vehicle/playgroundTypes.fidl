@@ -1,0 +1,217 @@
+/*
+* Copyright (C) 2021, Bayerische Motoren Werke Aktiengesellschaft (BMW AG),
+*   Author: Alexander Domin (Alexander.Domin@bmw.de)
+* Copyright (C) 2021, ProFUSION Sistemas e Soluções LTDA,
+*   Author: Leonardo Ramos (leo.ramos@profusion.mobi)
+*
+* SPDX-License-Identifier: MPL-2.0
+*
+* This Source Code Form is subject to the terms of the
+* Mozilla Public License, v. 2.0. If a copy of the MPL was
+* not distributed with this file, You can obtain one at
+* http://mozilla.org/MPL/2.0/.
+*/
+
+package org.genivi.vehicle.playgroundtypes
+  typeCollection PlaygroundTypes {
+  <**
+      @description : The gear enumaration value
+  **>
+  enumeration Gear {
+    <**
+      @description : The unit is being initialized
+    **>
+    UNKNOWN_GEAR = 0
+    <**
+      @description : No gear is selected.
+    **>
+    NEUTRAL = 1
+    <**
+      @description : First gear is selected.
+    **>
+    FIRST_GEAR = 2
+    <**
+      @description : Second gear is selected.
+    **>
+    SECOND_GEAR = 3
+    <**
+      @description : Third gear is selected.
+    **>
+    THIRD_GEAR = 4
+    <**
+      @description : Fourth gear is selected.
+    **>
+    FOURTH_GEAR = 5
+    <**
+      @description : Fifth gear is selected.
+    **>
+    FIFTH_GEAR = 6
+    <**
+      @description : Sixth gear is selected.
+    **>
+    SIXTH_GEAR = 7
+    <**
+      @description : The gear sensor is reporting an error
+    **>
+    ERROR = 8
+  }
+
+  <**
+      @description : Drive Type,
+  **>
+  enumeration DriveType {
+    <**
+      @description : Power transmission drive on front axle
+    **>
+    FRONT_WHEEL_DRIVE = 1
+    <**
+      @description : Power transmission drive on rear axle
+    **>
+    REAR_WHEEL_DRIVE = 2
+    <**
+      @description : Power transmission drive on front and rear axles
+    **>
+    ALL_WHEEL_DRIVE = 3
+  }
+
+  struct GPSDate {
+    <**
+      @description : The current day provided by GPS
+    **>
+    UInt8 day
+    <**
+      @description : The current month provided by GPS
+    **>
+    UInt8 month
+    <**
+      @description : The current year provided by GPS
+    **>
+    UInt16 year
+  }
+
+  struct GPSTime {
+    <**
+    @description : Time seconds provided by GPS
+    **>
+    UInt8 second
+    <**
+    @description : Time minutes provided by GPS
+    **>
+    UInt8 minute
+    <**
+    @description : Time hours provided by GPS
+    **>
+    UInt8 hour
+  }
+
+  struct GPSPosition {
+    <**
+      @description : The current latitude coordinates of the vehicle
+    **>
+    Double currentLatitude
+    <**
+      @description : The current longitude coordinates of the vehicle
+    **>
+    Double currentLongitude
+    <**
+      @description : The current altitude coordinates of the vehicle
+    **>
+    Double currentAltitude
+  }
+
+  struct StatusGPS {
+    <**
+      @description : GPS status date
+    **>
+    GPSDate statusGPSDate
+    <**
+      @description : GPS status time
+    **>
+    GPSTime statusGPSTime
+    <**
+      @description : GPS status position
+    **>
+    GPSPosition statusfGPSPosition
+  }
+
+  struct DoorsStatus {
+    <**
+      @description : The opening status of the front left door
+    **>
+    Boolean frontLeft
+    <**
+      @description : The opening status of the front right door
+    **>
+    Boolean frontRight
+    <**
+      @description : The opening status of the rear left door
+    **>
+    Boolean rearLeft
+    <**
+      @description : The opening status of the rear right door
+    **>
+    Boolean rearRight
+  }
+
+  <**
+      @description : The gear enumaration value
+  **>
+  enumeration DoorsID {
+    <**
+      @description : Front left door
+    **>
+    FRONT_LEFT = 0
+    <**
+      @description : Front right door
+    **>
+    FRONT_RIGHT = 1
+    <**
+      @description : Rear left door
+    **>
+    REAR_LEFT = 2
+    <**
+      @description : Rear right door
+    **>
+    REAR_RIGHT = 3
+  }
+
+  <**
+      @description : Command to define the opening state of doors
+  **>
+  enumeration DoorCommand {
+    <**
+      @description : Command for keeping the current door state
+    **>
+    NOTHING = 0
+    <**
+      @description : Command for opening the door
+    **>
+    OPEN_DOOR = 1
+    <**
+      @description : Command for closing the door
+    **>
+    CLOSE_DOOR = 2
+  }
+
+  <**
+      @description : All the doors opening state for the vehicle
+  **>
+  struct CarDoorsCommand {
+    <**
+      @description : Front left door command
+    **>
+    DoorCommand frontLeftDoor
+    <**
+      @description : Front right door command
+    **>
+    DoorCommand frontRightDoor
+    <**
+      @description : Rear left door command
+    **>
+    DoorCommand rearLeftDoor
+    <**
+      @description : Rear right door command
+    **>
+    DoorCommand rearRightDoor
+  }
+}

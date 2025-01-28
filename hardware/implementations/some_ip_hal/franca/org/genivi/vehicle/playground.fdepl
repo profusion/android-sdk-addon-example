@@ -1,0 +1,120 @@
+/*
+* Copyright (C) 2021, Bayerische Motoren Werke Aktiengesellschaft (BMW AG),
+*   Author: Alexander Domin (Alexander.Domin@bmw.de)
+* Copyright (C) 2021, ProFUSION Sistemas e Soluções LTDA,
+*   Author: Leonardo Ramos (leo.ramos@profusion.mobi)
+*
+* SPDX-License-Identifier: MPL-2.0
+*
+* This Source Code Form is subject to the terms of the
+* Mozilla Public License, v. 2.0. If a copy of the MPL was
+* not distributed with this file, You can obtain one at
+* http://mozilla.org/MPL/2.0/.
+*/
+
+import
+"platform:/plugin/org.genivi.commonapi.someip/deployment/CommonAPI-4-SOMEIP_deployment_spec.fdepl"
+import "playground.fidl"
+import "playgroundTypes.fidl"
+import "playgroundTypes.fdepl"
+
+define org.genivi.commonapi.someip.deployment for interface
+org.genivi.vehicle.playground.Playground {
+  SomeIpServiceID = 65344
+
+  attribute consumption {
+    SomeIpGetterID = 1
+    SomeIpNotifierID = 32769
+    SomeIpNotifierEventGroups = {
+      1
+    }
+  }
+
+  attribute capacity {
+    SomeIpGetterID = 2
+  }
+
+  attribute volume {
+    SomeIpGetterID = 3
+  }
+
+  attribute engineSpeed {
+    SomeIpGetterID = 4
+    SomeIpNotifierID = 32770
+    SomeIpNotifierEventGroups = {
+      2
+    }
+  }
+
+  attribute currentGear {
+    SomeIpGetterID = 5
+    SomeIpNotifierID = 32771
+    SomeIpNotifierEventGroups = {
+      3
+    }
+  }
+
+  attribute isReverseGearOn {
+    SomeIpGetterID = 6
+    SomeIpNotifierID = 32772
+    SomeIpNotifierEventGroups = {
+      4
+    }
+  }
+
+  attribute drivePowerTransmission {
+    SomeIpGetterID = 7
+    SomeIpNotifierID = 32773
+    SomeIpNotifierEventGroups = {
+      5
+    }
+  }
+
+  attribute doorsOpeningStatus {
+    SomeIpGetterID = 8
+    SomeIpNotifierID = 32774
+    SomeIpNotifierEventGroups = {
+      6
+    }
+  }
+
+  attribute seatHeatingStatus {
+    SomeIpGetterID = 9
+    SomeIpSetterID = 10
+    SomeIpNotifierID = 32775
+    SomeIpNotifierEventGroups = {
+      7
+    }
+  }
+
+  attribute seatHeatingLevel {
+    SomeIpGetterID = 11
+    SomeIpSetterID = 12
+    SomeIpNotifierID = 32776
+    SomeIpNotifierEventGroups = {
+      8
+    }
+  }
+
+  method initTirePressureCalibration {
+    SomeIpMethodID = 13
+  }
+
+  method changeDoorsState {
+    SomeIpMethodID = 14
+  }
+
+  broadcast vehiclePosition {
+    SomeIpEventID = 32777
+    SomeIpEventGroups = {
+      9
+    }
+  }
+
+  broadcast currentTankVolume {
+    SomeIpEventID = 32778
+    SomeIpEventGroups = {
+      10
+    }
+  }
+}
